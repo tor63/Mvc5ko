@@ -8,6 +8,7 @@ namespace Mvc5ko.Model
 {
     public class SalesOrder
     {
+    //sdfsdf
         public int SalesOrderId { get; set; }
         public string CustomerName { get; set; }
         public string PONumber { get; set; }
