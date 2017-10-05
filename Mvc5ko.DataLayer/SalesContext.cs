@@ -11,13 +11,19 @@ namespace Mvc5ko.DataLayer
     //PM commands:
     //migrate : enable-migrations -EnableAutomaticMigrations
     //update-database -Verbose
+
+    //OR
+    //migrate : enable-migrations 
+    //add-migration Initial
+    //update-database -Verbose
+
     public class SalesContext : DbContext
     {
         public DbSet<SalesOrder> SalesOrders { get; set; }
 
-        public SalesContext() : base("DefaultConnection")
-        {
+        //public SalesContext() : base("DefaultConnection")
+        //{
             
-        }
+        //}
     }
 }

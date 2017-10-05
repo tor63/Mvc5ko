@@ -47,6 +47,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Migrations\201710041542251_Initial.cs" />
+    <Compile Include="Migrations\201710041542251_Initial.Designer.cs">
+      <DependentUpon>201710041542251_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710041552445_addDate.cs" />
+    <Compile Include="Migrations\201710041552445_addDate.Designer.cs">
+      <DependentUpon>201710041552445_addDate.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SalesContext.cs" />
@@ -60,6 +68,14 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201710041542251_Initial.resx">
+      <DependentUpon>201710041542251_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710041552445_addDate.resx">
+      <DependentUpon>201710041552445_addDate.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
