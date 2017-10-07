@@ -55,9 +55,26 @@
     <Compile Include="Migrations\201710041552445_addDate.Designer.cs">
       <DependentUpon>201710041552445_addDate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201710070814065_addCommentfield.cs" />
+    <Compile Include="Migrations\201710070814065_addCommentfield.Designer.cs">
+      <DependentUpon>201710070814065_addCommentfield.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710070906125_defineConfiguration.cs" />
+    <Compile Include="Migrations\201710070906125_defineConfiguration.Designer.cs">
+      <DependentUpon>201710070906125_defineConfiguration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710070913370_defineConfiguration02.cs" />
+    <Compile Include="Migrations\201710070913370_defineConfiguration02.Designer.cs">
+      <DependentUpon>201710070913370_defineConfiguration02.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710071806171_deleteCols.cs" />
+    <Compile Include="Migrations\201710071806171_deleteCols.Designer.cs">
+      <DependentUpon>201710071806171_deleteCols.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SalesContext.cs" />
+    <Compile Include="SalesOrderConfiguration.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mvc5ko.Model\Mvc5ko.Model.csproj">
@@ -75,6 +92,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201710041552445_addDate.resx">
       <DependentUpon>201710041552445_addDate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710070814065_addCommentfield.resx">
+      <DependentUpon>201710070814065_addCommentfield.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710070906125_defineConfiguration.resx">
+      <DependentUpon>201710070906125_defineConfiguration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710070913370_defineConfiguration02.resx">
+      <DependentUpon>201710070913370_defineConfiguration02.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710071806171_deleteCols.resx">
+      <DependentUpon>201710071806171_deleteCols.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

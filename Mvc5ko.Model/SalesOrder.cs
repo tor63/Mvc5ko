@@ -13,6 +13,9 @@ namespace Mvc5ko.Model
         public string CustomerName { get; set; }
         public string PONumber { get; set; }
         
-        public DateTime Date { get; set; }
+        //public DateTime Date { get; set; }
+
+        //public string Comment { get; set; }
+
     }
 }
