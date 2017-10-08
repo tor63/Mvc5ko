@@ -21,7 +21,6 @@ namespace Mvc5ko.Web.Controllers
             _salesContext = new SalesContext();
         }
 
-        // GET: Sales
         public ActionResult Index()
         {
             return View(_salesContext.SalesOrders.ToList());
@@ -45,39 +44,19 @@ namespace Mvc5ko.Web.Controllers
                 SalesOrderId = salesOrder.SalesOrderId,
                 CustomerName = salesOrder.CustomerName,
                 PONumber = salesOrder.PONumber,
-                //Date = salesOrder.Date,
-                //Comment = salesOrder.Comment,
-                MessageToClient = "I originated from the viewmodel"
+                MessageToClient = "I originated from the viewmodel, rather than the model."
             };
 
             return View(salesOrderViewModel);
         }
 
-        // GET: Sales/Create
         public ActionResult Create()
         {
             SalesOrderViewModel salesOrderViewModel = new SalesOrderViewModel();
+            salesOrderViewModel.ObjectState = ObjectState.Added;
             return View(salesOrderViewModel);
         }
 
-        // POST: Sales/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "SalesOrderId,CustomerName,PONumber,Date,Comment")] SalesOrder salesOrder)
-        {
-            if (ModelState.IsValid)
-            {
-                _salesContext.SalesOrders.Add(salesOrder);
-                _salesContext.SaveChanges();
-                return RedirectToAction("Index");
-            }
-
-            return View(salesOrder);
-        }
-
-        // GET: Sales/Edit/5
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -89,26 +68,19 @@ namespace Mvc5ko.Web.Controllers
             {
                 return HttpNotFound();
             }
-            return View(salesOrder);
-        }
-
-        // POST: Sales/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "SalesOrderId,CustomerName,PONumber,Date,Comment")] SalesOrder salesOrder)
-        {
-            if (ModelState.IsValid)
+            SalesOrderViewModel salesOrderViewModel = new SalesOrderViewModel
             {
-                _salesContext.Entry(salesOrder).State = EntityState.Modified;
-                _salesContext.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            return View(salesOrder);
+                SalesOrderId = salesOrder.SalesOrderId,
+                CustomerName = salesOrder.CustomerName,
+                PONumber = salesOrder.PONumber,
+                MessageToClient = string.Format("The original value of Customer Name is {0}", salesOrder.CustomerName),
+                ObjectState = ObjectState.Unchanged
+            };
+
+            return View(salesOrderViewModel);
         }
 
-        // GET: Sales/Delete/5
+ 
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -123,18 +95,7 @@ namespace Mvc5ko.Web.Controllers
             return View(salesOrder);
         }
 
-        // POST: Sales/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            SalesOrder salesOrder = _salesContext.SalesOrders.Find(id);
-            _salesContext.SalesOrders.Remove(salesOrder);
-            _salesContext.SaveChanges();
-            return RedirectToAction("Index");
-        }
-
-        protected override void Dispose(bool disposing)
+         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
@@ -147,13 +108,34 @@ namespace Mvc5ko.Web.Controllers
         {
             //ViewModel is mapped to server side model and save in database. 
             SalesOrder salesOrder = new SalesOrder();
+            salesOrder.SalesOrderId = salesOrderViewModel.SalesOrderId;
             salesOrder.CustomerName = salesOrderViewModel.CustomerName;
             salesOrder.PONumber = salesOrderViewModel.PONumber;
+            salesOrder.ObjectState = salesOrderViewModel.ObjectState;
 
-            _salesContext.SalesOrders.Add(salesOrder);
+            _salesContext.SalesOrders.Attach(salesOrder);
+            _salesContext.ChangeTracker.Entries<IObjectWithState>().Single().State = Helpers.ConvertState(salesOrder.ObjectState);
             _salesContext.SaveChanges();
 
-            salesOrderViewModel.MessageToClient = string.Format("{0}'s sales order is added", salesOrder.CustomerName);
+            switch (salesOrderViewModel.ObjectState)
+            {
+                case ObjectState.Unchanged:
+                    break;
+                case ObjectState.Added:
+                    salesOrderViewModel.MessageToClient = string.Format("{0}'s sales order is added", salesOrder.CustomerName);
+                    break;
+                case ObjectState.Modified:
+                    salesOrderViewModel.MessageToClient = string.Format("{0}'s sales order is modified", salesOrder.CustomerName);
+                    break;
+                case ObjectState.Deleted:
+                    break;
+                default:
+                    break;
+            }
+
+            salesOrderViewModel.SalesOrderId = salesOrder.SalesOrderId;
+            //Data is updated in the database - client can no start with unchanged data
+            salesOrderViewModel.ObjectState = ObjectState.Unchanged;
 
             //Saved ViewModel data is sent back to Client as ananoumous data
             return Json(new { salesOrderViewModel });
