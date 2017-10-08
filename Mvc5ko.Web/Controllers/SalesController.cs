@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Linq;
+﻿using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
 using Mvc5ko.DataLayer;
 using Mvc5ko.Model;
@@ -14,7 +9,7 @@ namespace Mvc5ko.Web.Controllers
 {
     public class SalesController : Controller
     {
-        private SalesContext _salesContext;// = new SalesContext();
+        private SalesContext _salesContext;
 
         public SalesController()
         {
@@ -39,14 +34,8 @@ namespace Mvc5ko.Web.Controllers
                 return HttpNotFound();
             }
 
-            //Added code:
-            SalesOrderViewModel salesOrderViewModel = new SalesOrderViewModel
-            {
-                SalesOrderId = salesOrder.SalesOrderId,
-                CustomerName = salesOrder.CustomerName,
-                PONumber = salesOrder.PONumber,
-                MessageToClient = "I originated from the viewmodel, rather than the model."
-            };
+            SalesOrderViewModel salesOrderViewModel = ViewModels.Helpers.CreateSalesOrderViewModelFromSalesOrder(salesOrder);
+            salesOrderViewModel.MessageToClient = "I originated from the viewmodel, rather than the model.";
 
             return View(salesOrderViewModel);
         }
@@ -69,14 +58,10 @@ namespace Mvc5ko.Web.Controllers
             {
                 return HttpNotFound();
             }
-            SalesOrderViewModel salesOrderViewModel = new SalesOrderViewModel
-            {
-                SalesOrderId = salesOrder.SalesOrderId,
-                CustomerName = salesOrder.CustomerName,
-                PONumber = salesOrder.PONumber,
-                MessageToClient = string.Format("The original value of Customer Name is {0}", salesOrder.CustomerName),
-                ObjectState = ObjectState.Unchanged
-            };
+
+            SalesOrderViewModel salesOrderViewModel = ViewModels.Helpers.CreateSalesOrderViewModelFromSalesOrder(salesOrder);
+            salesOrderViewModel.MessageToClient = string.Format("The original value of Customer Name is {0}.", salesOrderViewModel.CustomerName);
+            salesOrderViewModel.ObjectState = ObjectState.Unchanged;
 
             return View(salesOrderViewModel);
         }
@@ -94,14 +79,9 @@ namespace Mvc5ko.Web.Controllers
                 return HttpNotFound();
             }
 
-            SalesOrderViewModel salesOrderViewModel = new SalesOrderViewModel
-            {
-                SalesOrderId = salesOrder.SalesOrderId,
-                CustomerName = salesOrder.CustomerName,
-                PONumber = salesOrder.PONumber,
-                MessageToClient = string.Format("You are about to delete this sales order,  {0}", salesOrder.CustomerName),
-                ObjectState = ObjectState.Deleted
-            };
+            SalesOrderViewModel salesOrderViewModel = ViewModels.Helpers.CreateSalesOrderViewModelFromSalesOrder(salesOrder);
+            salesOrderViewModel.MessageToClient = "You are about to permanently delete this sales order.";
+            salesOrderViewModel.ObjectState = ObjectState.Deleted;
 
             return View(salesOrderViewModel);
         }
@@ -114,43 +94,23 @@ namespace Mvc5ko.Web.Controllers
             }
             base.Dispose(disposing);
         }
-
         public JsonResult Save(SalesOrderViewModel salesOrderViewModel)
         {
             //ViewModel is mapped to server side model and save in database. 
-            SalesOrder salesOrder = new SalesOrder();
-            salesOrder.SalesOrderId = salesOrderViewModel.SalesOrderId;
-            salesOrder.CustomerName = salesOrderViewModel.CustomerName;
-            salesOrder.PONumber = salesOrderViewModel.PONumber;
+            SalesOrder salesOrder = ViewModels.Helpers.CreateSalesOrderFromSalesOrderViewModel(salesOrderViewModel);
             salesOrder.ObjectState = salesOrderViewModel.ObjectState;
 
             _salesContext.SalesOrders.Attach(salesOrder);
-            _salesContext.ChangeTracker.Entries<IObjectWithState>().Single().State = Helpers.ConvertState(salesOrder.ObjectState);
+            _salesContext.ChangeTracker.Entries<IObjectWithState>().Single().State = DataLayer.Helpers.ConvertState(salesOrder.ObjectState);
             _salesContext.SaveChanges();
 
             if (salesOrder.ObjectState == ObjectState.Deleted)
-            {
-                //Return to the view list
-                return Json(new { newLocation = "/Sales/Index/" });
-            }
+                return Json(new { newLocation = "/Sales/Index/" }); //Return to the view list
 
-            switch (salesOrderViewModel.ObjectState)
-            {
-                case ObjectState.Unchanged:
-                    break;
-                case ObjectState.Added:
-                    salesOrderViewModel.MessageToClient = string.Format("{0}'s sales order is added", salesOrder.CustomerName);
-                    break;
-                case ObjectState.Modified:
-                    salesOrderViewModel.MessageToClient = string.Format("{0}'s sales order is modified", salesOrder.CustomerName);
-                    break;
-                default:
-                    break;
-            }
+            salesOrderViewModel.MessageToClient = ViewModels.Helpers.GetMessageToClient(salesOrderViewModel.ObjectState, salesOrder.CustomerName);
 
             salesOrderViewModel.SalesOrderId = salesOrder.SalesOrderId;
-            //Data is updated in the database - client can no start with unchanged data
-            salesOrderViewModel.ObjectState = ObjectState.Unchanged;
+            salesOrderViewModel.ObjectState = ObjectState.Unchanged; //Data is updated in the database - client can no start with unchanged data
 
             //Saved ViewModel data is sent back to Client as ananoumous data
             return Json(new { salesOrderViewModel });
