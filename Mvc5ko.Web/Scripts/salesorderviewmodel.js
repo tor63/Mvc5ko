@@ -22,6 +22,9 @@ SalesOrderViewModel = function (data) {
                 if (data.salesOrderViewModel != null)
                     ko.mapping.fromJS(data.salesOrderViewModel, {}, self);
 
+                //If deleted
+                if (data.newLocation != null)
+                    window.location = data.newLocation;
             }
         });
     },

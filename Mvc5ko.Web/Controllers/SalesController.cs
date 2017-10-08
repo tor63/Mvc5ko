@@ -40,7 +40,8 @@ namespace Mvc5ko.Web.Controllers
             }
 
             //Added code:
-            SalesOrderViewModel salesOrderViewModel = new SalesOrderViewModel {
+            SalesOrderViewModel salesOrderViewModel = new SalesOrderViewModel
+            {
                 SalesOrderId = salesOrder.SalesOrderId,
                 CustomerName = salesOrder.CustomerName,
                 PONumber = salesOrder.PONumber,
@@ -80,7 +81,7 @@ namespace Mvc5ko.Web.Controllers
             return View(salesOrderViewModel);
         }
 
- 
+
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -92,10 +93,20 @@ namespace Mvc5ko.Web.Controllers
             {
                 return HttpNotFound();
             }
-            return View(salesOrder);
+
+            SalesOrderViewModel salesOrderViewModel = new SalesOrderViewModel
+            {
+                SalesOrderId = salesOrder.SalesOrderId,
+                CustomerName = salesOrder.CustomerName,
+                PONumber = salesOrder.PONumber,
+                MessageToClient = string.Format("You are about to delete this sales order,  {0}", salesOrder.CustomerName),
+                ObjectState = ObjectState.Deleted
+            };
+
+            return View(salesOrderViewModel);
         }
 
-         protected override void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
@@ -104,7 +115,7 @@ namespace Mvc5ko.Web.Controllers
             base.Dispose(disposing);
         }
 
-        public JsonResult Save (SalesOrderViewModel salesOrderViewModel)
+        public JsonResult Save(SalesOrderViewModel salesOrderViewModel)
         {
             //ViewModel is mapped to server side model and save in database. 
             SalesOrder salesOrder = new SalesOrder();
@@ -117,6 +128,12 @@ namespace Mvc5ko.Web.Controllers
             _salesContext.ChangeTracker.Entries<IObjectWithState>().Single().State = Helpers.ConvertState(salesOrder.ObjectState);
             _salesContext.SaveChanges();
 
+            if (salesOrder.ObjectState == ObjectState.Deleted)
+            {
+                //Return to the view list
+                return Json(new { newLocation = "/Sales/Index/" });
+            }
+
             switch (salesOrderViewModel.ObjectState)
             {
                 case ObjectState.Unchanged:
@@ -126,8 +143,6 @@ namespace Mvc5ko.Web.Controllers
                     break;
                 case ObjectState.Modified:
                     salesOrderViewModel.MessageToClient = string.Format("{0}'s sales order is modified", salesOrder.CustomerName);
-                    break;
-                case ObjectState.Deleted:
                     break;
                 default:
                     break;
