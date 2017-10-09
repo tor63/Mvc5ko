@@ -8,16 +8,16 @@ namespace Mvc5ko.Model
 {
     public class SalesOrder : IObjectWithState
     {
-        //sdfsdf
+        public SalesOrder()
+        {
+            SalesOrderItems = new List<SalesOrderItem>();
+        }
+
         public int SalesOrderId { get; set; }
         public string CustomerName { get; set; }
         public string PONumber { get; set; }
         public ObjectState ObjectState { get; set; }
 
-
-        //public DateTime Date { get; set; }
-
-        //public string Comment { get; set; }
-
+        public virtual List<SalesOrderItem> SalesOrderItems { get; set; }
     }
 }

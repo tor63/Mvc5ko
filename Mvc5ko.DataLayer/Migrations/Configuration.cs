@@ -28,12 +28,21 @@ namespace Mvc5ko.DataLayer.Migrations
             //    new SalesOrder { CustomerName = "David", PONumber = "PO 222", Date = DateTime.Now, Comment = "kommentar for David" }
             //    );
             context.SalesOrders.AddOrUpdate(
-                         so => so.CustomerName,
-                         new SalesOrder { CustomerName = "Adam", PONumber = "1234",  },
-                         new SalesOrder { CustomerName = "Michal" },
-                         new SalesOrder { CustomerName = "David", PONumber = "PO 222"}
-                         );
-
+               so => so.CustomerName,
+               new SalesOrder
+               {
+                   CustomerName = "Adam",
+                   PONumber = "9876",
+                   SalesOrderItems =
+                   {
+                        new SalesOrderItem{ProductCode = "ABC123", Quantity = 10, UnitPrice = 1.23m },
+                        new SalesOrderItem{ProductCode = "XYZ987", Quantity = 7, UnitPrice = 14.57m },
+                        new SalesOrderItem{ProductCode = "SAMPLE", Quantity = 3, UnitPrice = 15.00m }
+                   }
+               },
+               new SalesOrder { CustomerName = "Michael" },
+               new SalesOrder { CustomerName = "David", PONumber = "Acme 9" }
+               );
         }
     }
 }

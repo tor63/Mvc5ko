@@ -61,8 +61,6 @@ namespace Mvc5ko.Web.Controllers
 
             SalesOrderViewModel salesOrderViewModel = ViewModels.Helpers.CreateSalesOrderViewModelFromSalesOrder(salesOrder);
             salesOrderViewModel.MessageToClient = string.Format("The original value of Customer Name is {0}.", salesOrderViewModel.CustomerName);
-            salesOrderViewModel.ObjectState = ObjectState.Unchanged;
-
             return View(salesOrderViewModel);
         }
 
@@ -81,7 +79,7 @@ namespace Mvc5ko.Web.Controllers
 
             SalesOrderViewModel salesOrderViewModel = ViewModels.Helpers.CreateSalesOrderViewModelFromSalesOrder(salesOrder);
             salesOrderViewModel.MessageToClient = "You are about to permanently delete this sales order.";
-            salesOrderViewModel.ObjectState = ObjectState.Deleted;
+            //salesOrderViewModel.ObjectState = ObjectState.Deleted;
 
             return View(salesOrderViewModel);
         }
@@ -98,19 +96,22 @@ namespace Mvc5ko.Web.Controllers
         {
             //ViewModel is mapped to server side model and save in database. 
             SalesOrder salesOrder = ViewModels.Helpers.CreateSalesOrderFromSalesOrderViewModel(salesOrderViewModel);
-            salesOrder.ObjectState = salesOrderViewModel.ObjectState;
 
             _salesContext.SalesOrders.Attach(salesOrder);
-            _salesContext.ChangeTracker.Entries<IObjectWithState>().Single().State = DataLayer.Helpers.ConvertState(salesOrder.ObjectState);
+            _salesContext.ApplyStateChanges();
+            //_salesContext.ChangeTracker.Entries<IObjectWithState>().Single().State = DataLayer.Helpers.ConvertState(salesOrder.ObjectState);
             _salesContext.SaveChanges();
 
             if (salesOrder.ObjectState == ObjectState.Deleted)
                 return Json(new { newLocation = "/Sales/Index/" }); //Return to the view list
 
-            salesOrderViewModel.MessageToClient = ViewModels.Helpers.GetMessageToClient(salesOrderViewModel.ObjectState, salesOrder.CustomerName);
+            //salesOrderViewModel.MessageToClient = ViewModels.Helpers.GetMessageToClient(salesOrderViewModel.ObjectState, salesOrder.CustomerName);
+            //salesOrderViewModel.SalesOrderId = salesOrder.SalesOrderId;
+            //salesOrderViewModel.ObjectState = ObjectState.Unchanged; //Data is updated in the database - client can no start with unchanged data
 
-            salesOrderViewModel.SalesOrderId = salesOrder.SalesOrderId;
-            salesOrderViewModel.ObjectState = ObjectState.Unchanged; //Data is updated in the database - client can no start with unchanged data
+            string messageToClient = ViewModels.Helpers.GetMessageToClient(salesOrderViewModel.ObjectState, salesOrder.CustomerName);
+            salesOrderViewModel = ViewModels.Helpers.CreateSalesOrderViewModelFromSalesOrder(salesOrder);
+            salesOrderViewModel.MessageToClient = messageToClient;
 
             //Saved ViewModel data is sent back to Client as ananoumous data
             return Json(new { salesOrderViewModel });

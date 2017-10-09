@@ -1,18 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data.Entity;
 using Mvc5ko.Model;
 
 namespace Mvc5ko.DataLayer
 {
-    //PM commands:
-    //migrate : enable-migrations -EnableAutomaticMigrations
-    //update-database -Verbose
-
-    //OR
     //migrate : enable-migrations 
     //add-migration Initial
     //update-database -Verbose
@@ -25,10 +15,12 @@ namespace Mvc5ko.DataLayer
     public class SalesContext : DbContext
     {
         public DbSet<SalesOrder> SalesOrders { get; set; }
+        public DbSet<SalesOrderItem> SalesOrderItems { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Configurations.Add(new SalesOrderConfiguration());
+            modelBuilder.Configurations.Add(new SalesOrderItemConfiguration());
         }
 
         //Constructor can be used if you want to specify database name!

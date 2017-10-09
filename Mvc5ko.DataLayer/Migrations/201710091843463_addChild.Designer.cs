@@ -7,13 +7,13 @@ namespace Mvc5ko.DataLayer.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class Initial : IMigrationMetadata
+    public sealed partial class addChild : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Initial));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(addChild));
         
         string IMigrationMetadata.Id
         {
-            get { return "201710041542251_Initial"; }
+            get { return "201710091843463_addChild"; }
         }
         
         string IMigrationMetadata.Source

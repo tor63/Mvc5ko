@@ -5,9 +5,27 @@
     Deleted: 3
 };
 
+var salesOrderItemMapping = {
+    'SalesOrderItems': {
+        key: function (salesOrderItem) {
+            return ko.utils.unwrapObservable(salesOrderItem.SalesOrderItemId);
+        },
+        create: function (options) {
+            return new SalesOrderItemViewModel(options.data);
+        }
+    }
+};
+
+//Client side view models
+SalesOrderItemViewModel = function (data) {
+    var self = this;
+    ko.mapping.fromJS(data, salesOrderItemMapping, self);
+};
+
+
 SalesOrderViewModel = function (data) {
     var self = this;
-    ko.mapping.fromJS(data, {}, self);
+    ko.mapping.fromJS(data, salesOrderItemMapping, self);
 
     self.save = function () {
         //Client side ViewModel is sent to a Controller Action
@@ -36,5 +54,11 @@ SalesOrderViewModel = function (data) {
                 self.ObjectState(ObjectState.Modified);
             }
             return true;
+        },
+
+        self.addSalesOrderItem = function () {
+            //Needs to add the state 'ObjectState.Added' to the item
+            var salesOrderItem = new SalesOrderItemViewModel({ SalesOrderItemId: 0, ProductCode: "", Quantity: 1, UnitPrice: 0, ObjectState: ObjectState.Added });
+            self.SalesOrderItems.push(salesOrderItem);
         };
 };
